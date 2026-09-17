@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sueldo Casas Particulares</title>
+<meta name="description" content="Calculadora de sueldo para personal de casas particulares, con escala 2026 mes a mes y contribuciones patronales ARCA.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6f3ec;
+    --surface:#ffffff;
+    --surface-2:#efe9db;
+    --ink:#241f16;
+    --ink-soft:#5c5544;
+    --line:#ddd4bf;
+    --accent:#2f6f5e;
+    --accent-ink:#ffffff;
+    --accent-soft:#e1efe9;
+    --warn:#a9631a;
+    --warn-soft:#f7ead9;
+    --shadow: 0 1px 2px rgba(36,31,22,.06), 0 8px 24px -12px rgba(36,31,22,.18);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#1b1912;
+      --surface:#242019;
+      --surface-2:#2c2820;
+      --ink:#f1ece0;
+      --ink-soft:#b8b09b;
+      --line:#3c3627;
+      --accent:#5fbb9f;
+      --accent-ink:#0f2019;
+      --accent-soft:#243b32;
+      --warn:#e0a15c;
+      --warn-soft:#3a2c18;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#1b1912;
+    --surface:#242019;
+    --surface-2:#2c2820;
+    --ink:#f1ece0;
+    --ink-soft:#b8b09b;
+    --line:#3c3627;
+    --accent:#5fbb9f;
+    --accent-ink:#0f2019;
+    --accent-soft:#243b32;
+    --warn:#e0a15c;
+    --warn-soft:#3a2c18;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+    padding-inline:16px;
+    padding-block:28px;
+    line-height:1.45;
+  }
+  .wrap{max-width:1040px;margin:0 auto;}
+  h1{
+    font-family:"Fraunces", Georgia, serif;
+    font-weight:700;
+    font-size:clamp(1.6rem,4vw,2.4rem);
+    text-wrap:balance;
+    margin:0 0 4px;
+    letter-spacing:-.01em;
+  }
+  .sub{color:var(--ink-soft);font-size:.98rem;max-width:60ch;margin:0 0 22px;}
+  .grid{display:grid;grid-template-columns:minmax(280px,1fr) minmax(300px,1.15fr);gap:20px;align-items:start;}
+  @media (max-width:760px){.grid{grid-template-columns:1fr;}}
+
+  .card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:22px;
+    box-shadow:var(--shadow);
+  }
+  .card + .card{margin-top:18px;}
+  .card h2{
+    font-family:"Fraunces", Georgia, serif;
+    font-size:1.05rem;
+    font-weight:600;
+    margin:0 0 14px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .eyebrow{
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    font-size:.72rem;
+    color:var(--accent);
+    font-weight:700;
+    margin-bottom:6px;
+  }
+
+  label{display:block;font-size:.85rem;color:var(--ink-soft);margin-bottom:5px;font-weight:600;}
+  select, input[type=number]{
+    width:100%;
+    font:inherit;
+    font-size:.95rem;
+    padding:9px 10px;
+    border-radius:8px;
+    border:1px solid var(--line);
+    background:var(--surface-2);
+    color:var(--ink);
+  }
+  select:focus, input:focus{outline:2px solid var(--accent);outline-offset:1px;}
+  .field{margin-bottom:14px;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+  fieldset{border:none;padding:0;margin:0 0 14px;}
+  .toggle{
+    display:flex;align-items:center;justify-content:space-between;
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:10px 12px;
+    cursor:pointer;
+    user-select:none;
+  }
+  .toggle span.lbl{font-size:.9rem;font-weight:600;}
+  .toggle small{display:block;color:var(--ink-soft);font-weight:400;font-size:.78rem;margin-top:2px;}
+  .switch{
+    width:42px;height:24px;border-radius:99px;background:var(--line);position:relative;flex:none;transition:background .15s;
+  }
+  .switch::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--surface);transition:transform .15s;box-shadow:0 1px 2px rgba(0,0,0,.25);}
+  input.hidden-check{position:absolute;opacity:0;pointer-events:none;}
+  input.hidden-check:checked + .toggle .switch{background:var(--accent);}
+  input.hidden-check:checked + .toggle .switch::after{transform:translateX(18px);}
+
+  table.dias{width:100%;border-collapse:collapse;}
+  table.dias th{
+    text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);
+    padding-bottom:6px;font-weight:700;
+  }
+  table.dias td{padding:4px 0;}
+  table.dias td.dia{font-size:.88rem;font-weight:600;}
+  table.dias input{padding:6px 8px;width:76px;text-align:right;font-variant-numeric:tabular-nums;}
+
+  .totalline{
+    display:flex;justify-content:space-between;align-items:baseline;
+    padding-top:12px;margin-top:10px;border-top:1px dashed var(--line);
+    font-size:.9rem;color:var(--ink-soft);
+  }
+  .totalline b{color:var(--ink);font-variant-numeric:tabular-nums;}
+
+  .result-row{
+    display:flex;justify-content:space-between;align-items:baseline;
+    padding:9px 0;border-bottom:1px solid var(--line);font-size:.92rem;
+    gap:12px;
+  }
+  .result-row:last-child{border-bottom:none;}
+  .result-row .val{font-variant-numeric:tabular-nums;font-family:"IBM Plex Mono",ui-monospace,monospace;white-space:nowrap;}
+  .result-row.sub .val, .result-row.sub .lab{color:var(--ink-soft);font-size:.86rem;}
+
+  .hero-total{
+    background:var(--accent);
+    color:var(--accent-ink);
+    border-radius:12px;
+    padding:18px 20px;
+    margin-bottom:16px;
+  }
+  .hero-total .eyebrow2{text-transform:uppercase;letter-spacing:.07em;font-size:.72rem;opacity:.85;font-weight:700;}
+  .hero-total .num{
+    font-family:"IBM Plex Mono",ui-monospace,monospace;
+    font-size:clamp(1.5rem,4vw,2rem);
+    font-weight:600;
+    margin-top:2px;
+    font-variant-numeric:tabular-nums;
+  }
+  .hero-total .num small{font-size:.55em;font-weight:500;opacity:.85;}
+
+  .pill{
+    display:inline-block;font-size:.72rem;font-weight:700;padding:2px 9px;border-radius:99px;
+    background:var(--accent-soft);color:var(--accent);border:1px solid transparent;
+  }
+  .pill.warn{background:var(--warn-soft);color:var(--warn);}
+
+  .note{
+    font-size:.78rem;color:var(--ink-soft);
+    background:var(--surface-2);
+    border-radius:10px;
+    padding:10px 12px;
+    margin-top:6px;
+  }
+  .note a{color:var(--accent);}
+  .alert{
+    font-size:.82rem;font-weight:600;
+    border-radius:10px;
+    padding:10px 12px;
+    margin-top:6px;
+    border:1px solid transparent;
+  }
+  .alert.info{background:var(--accent-soft);color:var(--accent);}
+  .alert.warn{background:var(--warn-soft);color:var(--warn);}
+  footer.note{margin-top:22px;line-height:1.55;}
+
+  .breakdown-toggle{
+    font-size:.82rem;font-weight:600;color:var(--accent);cursor:pointer;
+    display:inline-flex;align-items:center;gap:5px;margin-top:12px;background:none;border:none;padding:0;font-family:inherit;
+  }
+  .breakdown{margin-top:8px;}
+
+  .print-btn{
+    display:inline-flex;align-items:center;gap:8px;
+    font:inherit;font-weight:700;font-size:.9rem;
+    background:var(--accent);color:var(--accent-ink);
+    border:none;border-radius:10px;
+    padding:11px 18px;cursor:pointer;
+    margin-bottom:18px;
+  }
+  .print-btn:hover{filter:brightness(1.08);}
+
+  @media print{
+    @page{ size: auto; margin: 8mm; }
+    .no-print{display:none !important;}
+    html, body{background:#fff;height:auto;}
+    body{padding:0;font-size:9.5px;line-height:1.25;}
+    .wrap{max-width:none;}
+    .eyebrow{margin-bottom:2px;font-size:.68rem;}
+    h1{font-size:1.3rem;margin-bottom:2px;}
+    .sub{display:none;}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:start;}
+    .card{box-shadow:none;border:1px solid #ccc;border-radius:6px;padding:8px 10px;break-inside:avoid;}
+    .card + .card{margin-top:8px;}
+    .card h2{font-size:.82rem;margin-bottom:6px;}
+    .field{margin-bottom:6px;}
+    label{margin-bottom:2px;font-size:.68rem;}
+    select, input[type=number]{padding:3px 6px;font-size:.78rem;}
+    .toggle{padding:5px 8px;}
+    .toggle small{font-size:.62rem;}
+    .result-row{padding:3px 0;font-size:.76rem;gap:6px;}
+    .result-row sub small, .result-row small{display:none;}
+    .totalline{padding-top:5px;margin-top:5px;font-size:.72rem;}
+    .hero-total{background:#eee !important;color:#000 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:8px 10px;margin-top:6px;margin-bottom:6px;}
+    .hero-total .num{font-size:1.1rem;}
+    input, select{border:none;background:none;color:#000;-webkit-appearance:none;}
+    .switch{display:none;}
+    .toggle{background:none;border:1px solid #ccc;}
+    .note{padding:5px 7px;font-size:.65rem;}
+    #snr-hint{display:none;}
+  }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Personal de casas particulares · Argentina</div>
+  <h1>Calculadora de sueldo 2026</h1>
+  <p class="sub">Cargá el horario semanal y la categoría: la escala se actualiza sola según el mes elegido (UPACP, valores 2026) y se suman los adicionales de zona y antigüedad. Abajo también figura lo que el empleador paga a ARCA.</p>
+
+  <button class="print-btn no-print" id="print-btn">🖨️ Imprimir / Descargar como PDF</button>
+
+  <div class="grid">
+    <!-- INPUTS -->
+    <div>
+      <div class="card">
+        <h2>1 · Datos de la liquidación</h2>
+        <div class="row2">
+          <div class="field">
+            <label for="mes">Mes a liquidar</label>
+            <select id="mes"></select>
+            <div id="mes-pill-wrap" style="margin-top:6px;"></div>
+          </div>
+          <div class="field">
+            <label for="modalidad">Modalidad</label>
+            <select id="modalidad">
+              <option value="con">Con retiro</option>
+              <option value="sin">Sin retiro</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="categoria">Categoría</label>
+          <select id="categoria"></select>
+        </div>
+        <div class="field">
+          <label for="antig">Antigüedad (años completos)</label>
+          <input type="number" id="antig" min="0" max="40" step="1" value="0">
+        </div>
+
+        <input type="checkbox" id="zona" class="hidden-check">
+        <label for="zona" class="toggle">
+          <span class="lbl">Adicional zona desfavorable<small>+31% sobre el básico — Patagonia y otras zonas alcanzadas</small></span>
+          <span class="switch"></span>
+        </label>
+
+        <details style="margin-top:14px;" class="no-print">
+          <summary style="cursor:pointer;font-size:.78rem;color:var(--ink-soft);font-weight:600;">Base de cálculo (avanzado)</summary>
+          <div class="field" style="margin-top:10px;margin-bottom:0;">
+            <label for="modoCalculo" style="font-size:.78rem;">Cómo se prorratea el básico de escala (48 hs/sem)</label>
+            <select id="modoCalculo" style="font-size:.82rem;">
+              <option value="auto">Automático según las horas semanales (recomendado)</option>
+              <option value="hora">Forzar: valor hora × horas trabajadas</option>
+              <option value="mensual">Forzar: valor mensual de la escala, prorrateado</option>
+            </select>
+            <div class="note" id="modo-alerta" style="margin-top:8px"></div>
+            <div class="note" id="modo-explic" style="margin-top:8px"></div>
+          </div>
+        </details>
+      </div>
+
+      <div class="card no-print">
+        <h2>2 · Horario semanal</h2>
+        <table class="dias">
+          <thead><tr><th>Día</th><th style="text-align:right">Horas</th></tr></thead>
+          <tbody id="dias-body"></tbody>
+        </table>
+        <div class="totalline"><span>Total horas / semana</span> <b id="tot-sem">0</b></div>
+        <div class="totalline"><span>Horas / mes (× 4,33 semanas)</span> <b id="tot-mes">0</b></div>
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div>
+      <div class="card">
+        <h2>3 · Liquidación del mes</h2>
+
+        <div class="result-row" id="row-basico"><span id="lab-basico">Básico proporcionado a 0 hs/semana</span><span class="val" id="out-basico">$0</span></div>
+        <div class="result-row sub" id="row-antig"><span>+ Antigüedad</span><span class="val" id="out-antig">$0</span></div>
+        <div class="result-row sub" id="row-zona"><span>+ Zona desfavorable</span><span class="val" id="out-zona">$0</span></div>
+
+        <div class="result-row sub">
+          <span>+ Suma no remunerativa (SNR)<br><small style="font-weight:400;color:var(--ink-soft)" id="snr-hint"></small></span>
+          <span><input type="number" id="snr" min="0" step="100" value="0" style="width:110px;text-align:right;font-variant-numeric:tabular-nums;"></span>
+        </div>
+        <div class="result-row sub">
+          <span>+ Otros conceptos <br><small style="font-weight:400;color:var(--ink-soft)">Vacaciones / SAC devengado / otros</small></span>
+          <span><input type="number" id="otros" min="0" step="100" value="0" style="width:110px;text-align:right;font-variant-numeric:tabular-nums;"></span>
+        </div>
+
+        <div class="result-row" id="row-bruto"><b>Total remunerativo (bruto)</b><span class="val" id="out-sueldo"><b>$0</b></span></div>
+        <div class="result-row sub"><span>− Descuento obra social (retenido)</span><span class="val" id="out-os2">$0</span></div>
+
+        <div class="hero-total" style="margin-top:14px;">
+          <div class="eyebrow2">Neto a cobrar por el empleado</div>
+          <div class="num" id="out-neto">$ 0</div>
+        </div>
+
+        <button class="breakdown-toggle" id="sac-toggle">▸ Ver SAC (aguinaldo) proporcional</button>
+        <div class="breakdown note" id="sac-box" style="display:none">
+          El SAC equivale a 1 sueldo mensual dividido 12, y se paga en dos cuotas: 30/06 y 18/12. Proporcional de este mes: <b id="out-sac">$0</b>. No está incluido en el neto de arriba (salvo que lo cargues en "Otros conceptos").
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>4 · Aportes y contribuciones a cargo del empleador (ARCA) <span class="pill" id="banda-pill">—</span></h2>
+        <p class="sub" style="margin-bottom:10px">Monto mensual que el empleador deposita en ARCA (jubilación SIPA, obra social y ART), según la banda horaria semanal.</p>
+        <div class="result-row"><span>Total a depositar en ARCA</span><span class="val" id="out-arca">$0</span></div>
+        <div class="result-row sub"><span>· Aporte obra social (retenido al empleado, ya descontado arriba)</span><span class="val" id="out-os">$0</span></div>
+        <div class="result-row sub"><span>· Contribución SIPA + ART (costo propio del empleador)</span><span class="val" id="out-pat">$0</span></div>
+        <div id="arca-fuente" class="note" style="margin-top:10px"></div>
+      </div>
+
+      <div class="card" style="background:var(--accent-soft);border-color:transparent;">
+        <h2 style="margin-bottom:6px">Costo total para el empleador</h2>
+        <div class="hero-total" style="background:transparent;color:var(--ink);padding:0;margin-bottom:0;">
+          <div class="num" id="out-total">$ 0</div>
+          <div style="font-size:.8rem;color:var(--ink-soft);margin-top:2px;">total remunerativo + contribución patronal (SIPA + ART) del mes</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="note no-print">
+    <b>Fuentes y vigencia:</b> escalas salariales según los valores oficiales publicados por UPACP en <a href="https://upacp.org.ar/?page_id=26745" target="_blank" rel="noopener">upacp.org.ar</a> (enero a septiembre 2026 confirmados; octubre a diciembre son proyecciones del acuerdo paritario homologado, a confirmar cuando UPACP publique el valor definitivo). Aportes y contribuciones según los PDF mensuales oficiales de ARCA (ex AFIP) en <a href="https://www.afip.gob.ar/casasparticulares/aportes-contribuciones-ART/" target="_blank" rel="noopener">afip.gob.ar/casasparticulares</a>: el monto que ARCA publica para el "mes de vencimiento" es el que se paga efectivamente ese mes (con un mes de desfasaje respecto del mes vigente); los meses de octubre a diciembre 2026 aún no están publicados y se proyectaron manteniendo fijos los componentes de obra social y jubilación (SIPA) y aplicando a la Cuota ART los mismos porcentajes de aumento acordados para los básicos. Antes de pagar sueldos o aportes, confirmá el valor exacto del mes en esas fuentes oficiales.
+  </footer>
+</div>
+
+<script>
+(function(){
+  var MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+  var MES_ACTUAL = "Septiembre";
+
+  // categoria -> mes -> [conRetiro|null, sinRetiro]
+  // Enero-Septiembre: valores oficiales UPACP (upacp.org.ar/?page_id=26745). Octubre-Diciembre: provisorios (paritaria homologada mes a mes).
+  var ESCALAS = {
+    "Supervisora de personal": {
+      Enero:[3895.56,4254.05], Febrero:[3953.99,4317.76], Marzo:[4013.30,4382.63],
+      Abril:[4167.14,4541.75], Mayo:[4233.82,4614.42], Junio:[4297.33,4683.64],
+      Julio:[4438.77,4829.13], Agosto:[4523.11,4920.88], Septiembre:[4645.33,5049.58],
+      Octubre:[4805.82,5215.58], Noviembre:[4923.44,5339.07], Diciembre:[5002.21,5424.50]
+    },
+    "Personal para tareas específicas (cocina, choferes)": {
+      Enero:[3696.15,4039.45], Febrero:[3751.59,4100.04], Marzo:[3807.87,4161.54],
+      Abril:[3959.56,4318.35], Mayo:[4022.91,4387.44], Junio:[4083.26,4453.26],
+      Julio:[4223.25,4597.18], Agosto:[4303.49,4684.53], Septiembre:[4422.54,4809.80],
+      Octubre:[4580.79,4973.38], Noviembre:[4695.58,5093.83], Diciembre:[4770.71,5175.33]
+    },
+    "Caseros": {
+      Enero:[null,3494.25], Febrero:[null,3546.66], Marzo:[null,3599.86],
+      Abril:[null,3745.18], Mayo:[null,3805.10], Junio:[null,3862.18],
+      Julio:[null,3996.45], Agosto:[null,4072.38], Septiembre:[null,4185.94],
+      Octubre:[null,4337.54], Noviembre:[null,4447.12], Diciembre:[null,4518.27]
+    },
+    "Asistencia y cuidado de personas": {
+      Enero:[3494.25,3894.43], Febrero:[3546.66,3952.85], Marzo:[3599.86,4012.14],
+      Abril:[3745.18,4165.14], Mayo:[3805.10,4231.79], Junio:[3862.18,4295.26],
+      Julio:[3996.45,4435.86], Agosto:[4072.38,4520.14], Septiembre:[4185.94,4641.90],
+      Octubre:[4337.54,4801.52], Noviembre:[4447.12,4918.65], Diciembre:[4518.27,4997.35]
+    },
+    "Personal para tareas generales": {
+      Enero:[3250.13,3494.25], Febrero:[3298.88,3546.66], Marzo:[3348.37,3599.86],
+      Abril:[3491.58,3745.18], Mayo:[3547.45,3805.10], Junio:[3600.66,3862.18],
+      Julio:[3733.72,3996.45], Agosto:[3804.66,4072.38], Septiembre:[3914.64,4185.94],
+      Octubre:[4064.08,4460.36], Noviembre:[4170.52,4571.91], Diciembre:[4237.24,4645.06]
+    }
+  };
+
+  // categoria -> mes -> [mensualConRetiro|null, mensualSinRetiro] — valor mensual de escala (jornada de referencia UPACP)
+  var MENSUALES = {
+    "Supervisora de personal": {
+      Enero:[485961.09,539711.97], Febrero:[493250.51,547807.65], Marzo:[500649.26,556024.76],
+      Abril:[519840.95,576213.21], Mayo:[528158.40,585432.62], Junio:[536080.78,594214.11],
+      Julio:[553725.91,612673.11], Agosto:[564246.70,624313.90], Septiembre:[579493.14,640641.55],
+      Octubre:[599514.53,661702.46], Noviembre:[614186.76,677369.69], Diciembre:[624013.75,688207.61]
+    },
+    "Personal para tareas específicas (cocina, choferes)": {
+      Enero:[452478.51,502101.03], Febrero:[459265.69,509632.55], Marzo:[466154.67,517277.03],
+      Abril:[484725.45,536768.02], Mayo:[492481.06,545356.31], Junio:[499868.28,553536.65],
+      Julio:[517006.43,571426.17], Agosto:[526829.55,582283.27], Septiembre:[541402.49,597854.36],
+      Octubre:[560776.33,618187.89], Noviembre:[574828.75,633158.90], Diciembre:[584026.01,643289.44]
+    },
+    "Caseros": {
+      Enero:[null,441806.54], Febrero:[null,448433.64], Marzo:[null,455160.14],
+      Abril:[null,473533.02], Mayo:[null,481109.55], Junio:[null,488326.19],
+      Julio:[null,505302.76], Agosto:[null,514903.51], Septiembre:[null,529261.78],
+      Octubre:[null,548429.23], Noviembre:[null,562284.09], Diciembre:[null,571280.64]
+    },
+    "Asistencia y cuidado de personas": {
+      Enero:[441806.54,490745.56], Febrero:[448433.64,498106.74], Marzo:[455160.14,505578.34],
+      Abril:[473533.02,524858.76], Mayo:[481109.55,533256.50], Junio:[488326.19,541255.35],
+      Julio:[505302.76,558972.92], Agosto:[514903.51,569593.41], Septiembre:[529261.78,584936.09],
+      Octubre:[548429.23,605050.00], Noviembre:[562284.09,619810.80], Diciembre:[571280.64,629727.77]
+    },
+    "Personal para tareas generales": {
+      Enero:[398722.14,441806.54], Febrero:[404702.97,448433.64], Marzo:[410773.52,455160.14],
+      Abril:[428347.44,473533.02], Mayo:[435201.00,481109.55], Junio:[441729.02,488326.19],
+      Julio:[458053.22,505302.76], Agosto:[466756.23,514903.51], Septiembre:[480247.85,529261.78],
+      Octubre:[498582.06,563958.82], Noviembre:[511639.37,578062.16], Diciembre:[519825.60,587311.15]
+    }
+  };
+
+  // Importe TOTAL a depositar en ARCA en el mes indicado (mes de VENCIMIENTO / pago), con su apertura:
+  // os = Aportes Agentes de Seguro de Salud (según el usuario, se descuenta del sueldo del trabajador)
+  // patronal = Contribuciones SIPA + Cuota ART (costo adicional real a cargo del empleador)
+  // Fuente: PDFs mensuales oficiales de ARCA (ex AFIP), https://www.afip.gob.ar/casasparticulares/aportes-contribuciones-ART/
+  var CONTRIB = {
+    Enero:      {b1:{tot:8359.52, os:1561.13, pat:6798.39},  b2:{tot:13076.37, os:2892.82, pat:10183.55}, b3:{tot:34036.97, os:19239.97, pat:14797.00}, est:false},
+    Febrero:    {b1:{tot:8812.75, os:1784.27, pat:7028.48},  b2:{tot:13840.63, os:3306.32, pat:10534.31}, b3:{tot:37271.19, os:21990.11, pat:15281.08}, est:false},
+    Marzo:      {b1:{tot:8884.78, os:1784.27, pat:7100.51},  b2:{tot:13955.89, os:3306.32, pat:10649.57}, b3:{tot:37449.05, os:21990.11, pat:15458.94}, est:false},
+    Abril:      {b1:{tot:9093.32, os:1784.27, pat:7309.05},  b2:{tot:14289.56, os:3306.32, pat:10983.24}, b3:{tot:37963.97, os:21990.11, pat:15973.86}, est:false},
+    Mayo:       {b1:{tot:9296.65, os:1784.27, pat:7512.38},  b2:{tot:14541.68, os:3306.32, pat:11235.36}, b3:{tot:38286.78, os:21990.11, pat:16296.67}, est:false},
+    Junio:      {b1:{tot:9374.12, os:1784.27, pat:7589.85},  b2:{tot:14665.62, os:3306.32, pat:11359.30}, b3:{tot:38478.05, os:21990.11, pat:16487.94}, est:false},
+    Julio:      {b1:{tot:9567.83, os:1784.27, pat:7783.56},  b2:{tot:14975.56, os:3306.32, pat:11669.24}, b3:{tot:38956.35, os:21990.11, pat:16966.24}, est:false},
+    Agosto:     {b1:{tot:10191.91,os:2084.85, pat:8107.06},  b2:{tot:16023.20, os:3863.30, pat:12159.90}, b3:{tot:43337.70, os:25694.55, pat:17643.15}, est:false},
+    Septiembre: {b1:{tot:10352.01,os:2084.85, pat:8267.16},  b2:{tot:16279.36, os:3863.30, pat:12416.06}, b3:{tot:43733.00, os:25694.55, pat:18038.45}, est:false},
+    Octubre:    {b1:{tot:10487.75,os:2084.85, pat:8402.90},  b2:{tot:16476.58, os:3863.30, pat:12613.28}, b3:{tot:44018.97, os:25694.55, pat:18324.42}, est:true},
+    Noviembre:  {b1:{tot:10618.35,os:2084.85, pat:8533.50},  b2:{tot:16665.18, os:3863.30, pat:12801.88}, b3:{tot:44294.24, os:25694.55, pat:18599.69}, est:true},
+    Diciembre:  {b1:{tot:10742.81,os:2084.85, pat:8657.96},  b2:{tot:16847.46, os:3863.30, pat:12984.16}, b3:{tot:44557.58, os:25694.55, pat:18863.03}, est:true}
+  };
+
+  var MESES_ESCALA_ESTIMADA = ["Octubre","Noviembre","Diciembre"];
+  var ANTIG_PCT = 0.01;
+  var ZONA_PCT = 0.31;
+  var DIAS = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
+  var DIAS_DEFAULT = [4,4,4,4,4,0,0];
+
+  function money(n){
+    return "$ " + n.toLocaleString("es-AR",{minimumFractionDigits:2,maximumFractionDigits:2});
+  }
+
+  var $mes = document.getElementById("mes");
+  var $cat = document.getElementById("categoria");
+  var $mod = document.getElementById("modalidad");
+  var $antig = document.getElementById("antig");
+  var $zona = document.getElementById("zona");
+  var $diasBody = document.getElementById("dias-body");
+
+  MESES.forEach(function(m){
+    var o = document.createElement("option");
+    o.value = m; o.textContent = m;
+    if(m===MES_ACTUAL) o.selected = true;
+    $mes.appendChild(o);
+  });
+  Object.keys(ESCALAS).forEach(function(c){
+    var o = document.createElement("option");
+    o.value = c; o.textContent = c;
+    $cat.appendChild(o);
+  });
+  $cat.value = "Personal para tareas generales";
+
+  DIAS.forEach(function(d,i){
+    var tr = document.createElement("tr");
+    var tdDia = document.createElement("td");
+    tdDia.className = "dia";
+    tdDia.textContent = d;
+    var tdHoras = document.createElement("td");
+    tdHoras.style.textAlign = "right";
+    var inp = document.createElement("input");
+    inp.type = "number"; inp.min = "0"; inp.max = "24"; inp.step = "0.5";
+    inp.value = DIAS_DEFAULT[i];
+    inp.className = "hora-dia";
+    inp.id = "hora-"+i;
+    tdHoras.appendChild(inp);
+    tr.appendChild(tdDia); tr.appendChild(tdHoras);
+    $diasBody.appendChild(tr);
+  });
+
+  function banda(hs){
+    if(hs < 12) return "b1";
+    if(hs < 16) return "b2";
+    return "b3";
+  }
+  var bandaLabel = {b1:"< 12 hs/sem", b2:"12 a 16 hs/sem", b3:"≥ 16 hs/sem"};
+
+  function recalc(){
+    var horas = [];
+    var totSem = 0;
+    for(var i=0;i<7;i++){
+      var v = parseFloat(document.getElementById("hora-"+i).value) || 0;
+      horas.push(v); totSem += v;
+    }
+    var totMes = totSem * 4.33;
+    document.getElementById("tot-sem").textContent = totSem.toLocaleString("es-AR");
+    document.getElementById("tot-mes").textContent = totMes.toLocaleString("es-AR",{maximumFractionDigits:1});
+
+    var mes = $mes.value, cat = $cat.value, mod = $mod.value;
+    var esCasero = (cat === "Caseros");
+    if(esCasero && mod === "con"){ $mod.value = "sin"; mod = "sin"; }
+    document.getElementById("modalidad").disabled = esCasero;
+
+    var par = ESCALAS[cat][mes];
+    var base = mod === "con" ? par[0] : par[1];
+    if(base == null) base = par[1];
+
+    document.getElementById("lab-basico").textContent = "Básico proporcionado a " + totSem.toFixed(1) + " hs/semana";
+
+    var mesPillWrap = document.getElementById("mes-pill-wrap");
+    mesPillWrap.innerHTML = MESES_ESCALA_ESTIMADA.indexOf(mes) !== -1
+      ? '<span class="pill warn">Escala proyectada, aún no homologada</span>'
+      : '<span class="pill">Escala oficial UPACP</span>';
+
+    var antigAnios = parseInt($antig.value,10) || 0;
+    var addAntig = base * ANTIG_PCT * antigAnios;
+    var addZona = $zona.checked ? base * ZONA_PCT : 0;
+    var horaFinal = base + addAntig + addZona;
+
+    var modoSel = document.getElementById("modoCalculo").value;
+    var reglaModo = totSem < 24 ? "hora" : "mensual";
+    var modo = modoSel === "auto" ? reglaModo : modoSel;
+
+    var alertEl = document.getElementById("modo-alerta");
+    if(totSem < 24){
+      alertEl.textContent = "Con " + totSem.toFixed(1) + " hs/semana (menos de 24) corresponde abonar por HORA.";
+    } else {
+      alertEl.textContent = "Con " + totSem.toFixed(1) + " hs/semana (24 o más) corresponde abonar el MENSUAL prorrateado.";
+    }
+    alertEl.className = "alert " + (modoSel !== "auto" && modo !== reglaModo ? "warn" : "info");
+    if(modoSel !== "auto" && modo !== reglaModo){
+      alertEl.textContent += " Elegiste forzar \"" + (modo==="hora"?"valor hora":"mensual prorrateado") + "\", que no coincide con lo que corresponde.";
+    }
+
+    var basicoProp, antigMonto, zonaMonto, explic;
+
+    if(modo === "hora"){
+      basicoProp = base * totMes;
+      antigMonto = addAntig * totMes;
+      zonaMonto = addZona * totMes;
+      explic = "Se toma el valor hora de la escala y se multiplica por las horas realmente trabajadas en el mes (ideal para changas u horarios acotados).";
+    } else {
+      var parM = MENSUALES[cat][mes];
+      var mensualBase = mod === "con" ? parM[0] : parM[1];
+      if(mensualBase == null) mensualBase = parM[1];
+      var JORNADA_REF = 48; // hs/semana de jornada completa de referencia (UPACP)
+      basicoProp = (mensualBase / JORNADA_REF) * totSem;
+      antigMonto = (mensualBase * ANTIG_PCT * antigAnios / JORNADA_REF) * totSem;
+      zonaMonto = $zona.checked ? (mensualBase * ZONA_PCT / JORNADA_REF) * totSem : 0;
+      var mensualFinal = mensualBase * (1 + ANTIG_PCT*antigAnios + ($zona.checked ? ZONA_PCT : 0));
+      explic = "Se toma el sueldo mensual publicado por la escala, se divide por 48 (jornada semanal completa de referencia) y se multiplica por las " +
+        totSem.toFixed(1) + " hs/semana informadas: " + money(mensualFinal) + " / 48 × " + totSem.toFixed(1) + " = " + money(basicoProp+antigMonto+zonaMonto) + ".";
+    }
+    document.getElementById("modo-explic").textContent = explic;
+    document.getElementById("out-basico").textContent = money(basicoProp);
+    document.getElementById("out-antig").textContent = money(antigMonto);
+    document.getElementById("out-zona").textContent = money(zonaMonto);
+
+    var snrHints = {
+      Septiembre: "En septiembre correspondería incorporar el 25% del bono por única vez de agosto ($8.000 a $20.000 según hs/semana). Cargá el monto si corresponde a tu caso — no verificado con UPACP.",
+      Octubre: "En octubre correspondería incorporar el 50% del bono de agosto. Cargá el monto si corresponde — no verificado con UPACP.",
+      Noviembre: "En noviembre correspondería incorporar el 25% restante del bono de agosto. Cargá el monto si corresponde — no verificado con UPACP."
+    };
+    document.getElementById("snr-hint").textContent = snrHints[mes] || "Cargá acá cualquier suma no remunerativa que la paritaria haya fijado para este mes (verificar con UPACP).";
+
+    var snr = parseFloat(document.getElementById("snr").value) || 0;
+    var otros = parseFloat(document.getElementById("otros").value) || 0;
+    var bruto = basicoProp + antigMonto + zonaMonto + snr + otros;
+
+    document.getElementById("out-sueldo").innerHTML = "<b>" + money(bruto) + "</b>";
+    document.getElementById("out-sac").textContent = money(bruto/12);
+
+    var b = banda(totSem);
+    var c = CONTRIB[mes];
+    var band = c[b];
+    document.getElementById("banda-pill").textContent = bandaLabel[b];
+    document.getElementById("banda-pill").className = "pill" + (c.est ? " warn" : "");
+    document.getElementById("out-arca").textContent = money(band.tot);
+    document.getElementById("out-os").textContent = money(band.os);
+    document.getElementById("out-pat").textContent = money(band.pat);
+    document.getElementById("arca-fuente").textContent = c.est
+      ? "Valor estimado para " + mes + " (aún no publicado por ARCA) — antes de pagar, confirmá el monto exacto en afip.gob.ar/casasparticulares."
+      : "Monto a pagar en " + mes + " 2026, según el PDF oficial de ARCA (ex AFIP).";
+
+    var neto = bruto - band.os;
+    document.getElementById("out-os2").textContent = money(band.os);
+    document.getElementById("out-neto").textContent = money(neto);
+
+    document.getElementById("out-total").innerHTML = money(bruto + band.pat);
+  }
+
+  document.getElementById("print-btn").addEventListener("click", function(){
+    window.print();
+  });
+
+  document.getElementById("sac-toggle").addEventListener("click", function(){
+    var box = document.getElementById("sac-box");
+    var open = box.style.display !== "none";
+    box.style.display = open ? "none" : "block";
+    this.textContent = (open ? "▸" : "▾") + " Ver SAC (aguinaldo) proporcional";
+  });
+
+  document.querySelectorAll("select, input").forEach(function(el){
+    el.addEventListener("input", recalc);
+    el.addEventListener("change", recalc);
+  });
+
+  recalc();
+})();
+</script>
+</body>
+</html>
