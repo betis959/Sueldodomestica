@@ -335,8 +335,10 @@
           <span><input type="number" id="otros" min="0" step="100" value="0" style="width:110px;text-align:right;font-variant-numeric:tabular-nums;"></span>
         </div>
 
+        <div class="note" id="bruto-formula" style="margin-top:4px;"></div>
         <div class="result-row" id="row-bruto"><b>Total remunerativo (bruto)</b><span class="val" id="out-sueldo"><b>$0</b></span></div>
         <div class="result-row sub"><span>− Descuento obra social (retenido)</span><span class="val" id="out-os2">$0</span></div>
+        <div class="note" id="neto-formula" style="margin-top:4px;"></div>
 
         <div class="hero-total" style="margin-top:14px;">
           <div class="eyebrow2">Neto a cobrar por el empleado</div>
@@ -602,6 +604,10 @@
     var otros = parseFloat(document.getElementById("otros").value) || 0;
     var bruto = basicoProp + antigMonto + zonaMonto + snr + otros;
 
+    document.getElementById("bruto-formula").textContent =
+      "Bruto = Básico (" + money(basicoProp) + ") + Antigüedad (" + money(antigMonto) + ") + Zona (" + money(zonaMonto) +
+      ") + SNR (" + money(snr) + ") + Otros (" + money(otros) + ") = " + money(bruto);
+
     document.getElementById("out-sueldo").innerHTML = "<b>" + money(bruto) + "</b>";
     document.getElementById("out-sac").textContent = money(bruto/12);
 
@@ -620,6 +626,8 @@
     var neto = bruto - band.os;
     document.getElementById("out-os2").textContent = money(band.os);
     document.getElementById("out-neto").textContent = money(neto);
+    document.getElementById("neto-formula").textContent =
+      "Neto = Total bruto (" + money(bruto) + ") − Obra social retenida (" + money(band.os) + ") = " + money(neto);
 
     document.getElementById("out-total").innerHTML = money(bruto + band.pat);
   }
