@@ -206,6 +206,27 @@
     display:inline-flex;align-items:center;gap:5px;margin-top:12px;background:none;border:none;padding:0;font-family:inherit;
   }
   .breakdown{margin-top:8px;}
+
+  .print-btn{
+    display:inline-flex;align-items:center;gap:8px;
+    font:inherit;font-weight:700;font-size:.9rem;
+    background:var(--accent);color:var(--accent-ink);
+    border:none;border-radius:10px;
+    padding:11px 18px;cursor:pointer;
+    margin-bottom:18px;
+  }
+  .print-btn:hover{filter:brightness(1.08);}
+
+  @media print{
+    .no-print{display:none !important;}
+    body{background:#fff;padding:0;}
+    .grid{grid-template-columns:1fr;}
+    .card{box-shadow:none;border:1px solid #ccc;break-inside:avoid;}
+    .hero-total{background:#eee !important;color:#000 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    input, select{border:none;background:none;color:#000;-webkit-appearance:none;}
+    .switch{display:none;}
+    .toggle{background:none;border:1px solid #ccc;}
+  }
 </style>
 
 </head>
@@ -214,6 +235,8 @@
   <div class="eyebrow">Personal de casas particulares · Argentina</div>
   <h1>Calculadora de sueldo 2026</h1>
   <p class="sub">Cargá el horario semanal y la categoría: la escala se actualiza sola según el mes elegido (UPACP, valores 2026) y se suman los adicionales de zona y antigüedad. Abajo también figura lo que el empleador paga a ARCA.</p>
+
+  <button class="print-btn no-print" id="print-btn">🖨️ Imprimir / Descargar como PDF</button>
 
   <div class="grid">
     <!-- INPUTS -->
@@ -249,7 +272,7 @@
           <span class="switch"></span>
         </label>
 
-        <details style="margin-top:14px;">
+        <details style="margin-top:14px;" class="no-print">
           <summary style="cursor:pointer;font-size:.78rem;color:var(--ink-soft);font-weight:600;">Base de cálculo (avanzado)</summary>
           <div class="field" style="margin-top:10px;margin-bottom:0;">
             <label for="modoCalculo" style="font-size:.78rem;">Cómo se prorratea el básico de escala (48 hs/sem)</label>
@@ -264,7 +287,7 @@
         </details>
       </div>
 
-      <div class="card">
+      <div class="card no-print">
         <h2>2 · Horario semanal</h2>
         <table class="dias">
           <thead><tr><th>Día</th><th style="text-align:right">Horas</th></tr></thead>
@@ -581,6 +604,10 @@
 
     document.getElementById("out-total").innerHTML = money(bruto + band.pat);
   }
+
+  document.getElementById("print-btn").addEventListener("click", function(){
+    window.print();
+  });
 
   document.getElementById("sac-toggle").addEventListener("click", function(){
     var box = document.getElementById("sac-box");
